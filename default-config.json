@@ -1,0 +1,17 @@
+{
+  "responseTimeout": "30000",
+  "excludedUsers": [],
+  "reportChannel": "standup",
+  "questions": [
+    "What're you working on? Any blockers?"
+  ],
+  "openings": [
+    "Hello"
+  ],
+  "closings": [
+    "Good Bye"
+  ],
+  "acknowledgements": [
+    "Thanks"
+  ]
+}
