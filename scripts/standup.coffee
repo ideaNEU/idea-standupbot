@@ -9,7 +9,7 @@ if configFile?
   try
     config = require(configFile)
   catch
-    #
+    robot.logger.error "can't load config"
 
 extend = (object, properties) ->
   for key, val of properties
@@ -111,6 +111,11 @@ module.exports = (robot) ->
     )
 
     res.send 'OK'
+
+  robot.router.get '/hubot/test-config', (req, res) ->
+    standupModel.reset()
+
+    res.send JSON.stringify(config)
 
   robot.error (err, res) ->
     robot.logger.error err
