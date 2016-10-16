@@ -3,13 +3,6 @@ defaultConfig = require('../default-config.json')
 
 standupModelFactory = require('./standupModel')
 
-configFile = process.env.HUBOT_STANDUP_CONFIG_FILE || null
-config = {}
-if configFile?
-  try
-    config = require(configFile)
-  catch
-    robot.logger.error "can't load config"
 
 extend = (object, properties) ->
   for key, val of properties
@@ -20,6 +13,14 @@ merge = (options, overrides) ->
   extend (extend {}, options), overrides
 
 module.exports = (robot) ->
+  configFile = process.env.HUBOT_STANDUP_CONFIG_FILE || null
+  config = {}
+  if configFile?
+    try
+      config = require(configFile)
+    catch
+      robot.logger.error "can't load config"
+
   config = merge defaultConfig, config
 
   standupModel = standupModelFactory robot.brain, config.questions
