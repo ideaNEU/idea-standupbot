@@ -13,11 +13,11 @@ merge = (options, overrides) ->
   extend (extend {}, options), overrides
 
 module.exports = (robot) ->
-  configFile = process.env.HUBOT_STANDUP_CONFIG_FILE || null
+  configJSONstr = process.env.HUBOT_STANDUP_CONFIG || null
   config = {}
-  if configFile?
+  if configJSONstr?
     try
-      config = require(configFile)
+      config = JSON.parse(configJSONstr)
     catch
       robot.logger.error "can't load config"
 
