@@ -2,6 +2,7 @@
   "name": "idea-standupbot",
   "version": "0.1.0",
   "author": "Drew <drewpom@icloud.com>",
+  "main": "index.coffee",
   "description": "A simple helpful standup robot for your Company",
   "dependencies": {
     "hubot": "^2.19.0",
