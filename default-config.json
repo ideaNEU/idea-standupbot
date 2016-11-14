@@ -1,8 +1,16 @@
 {
-  "responseTimeout": "30000",
+  "responseTimeout": "0",
   "excludedUsers": [],
   "reportChannel": "standup",
   "questions": [
+    {
+      "questionType": "repeated-followup",
+      "question": "How many ventures did you see?",
+      "followups": [
+        "What's up with your {ordinal} venture or the #{number}",
+        "Any blockers with your {ordinal}?"
+      ]
+    },
     "What're you working on? Any blockers?"
   ],
   "openings": [

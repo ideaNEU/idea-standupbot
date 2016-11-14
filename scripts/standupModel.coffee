@@ -1,4 +1,5 @@
 
+questionModelFactory = require('./questionModel')
 
 STATUS_KEY = 'statuses'
 
@@ -9,49 +10,76 @@ module.exports = (brain, questions) ->
     current = brain.get STATUS_KEY
     return current ? {}
 
+  startStandupWithUser = (userId) ->
+    model = forUser userId
+    for question in questions
+      model.questions.push questionModelFactory(question)
+    setUser userId, model
+
   lastMessageReceivedForUser = (userId) ->
     currentUserAnswers = forUser userId
     return currentUserAnswers.lastAnswerTimestamp
 
-  recordMessageReceivedForUser = (userId, msg) ->
+  currentAnswersForUser = (userId) ->
     currentAnswers = forUser userId
     currentAnswersForQuestion = currentAnswers.answers[currentAnswers.currentQuestion] ? []
+    return currentAnswersForQuestion
 
+  recordMessageReceivedForUser = (userId, msg) ->
+    model = forUser userId
+    currentAnswersForQuestion = currentAnswersForUser userId
     currentAnswersForQuestion.push msg
 
-    currentAnswers.answers[currentAnswers.currentQuestion] = currentAnswersForQuestion
-    currentAnswers.lastAnswerTimestamp = new Date().getTime()
+    model.answers[model.currentQuestion] = currentAnswersForQuestion
+    model.lastAnswerTimestamp = new Date().getTime()
 
-    setAnswersForUser userId, currentAnswers
+    setUser userId, model
 
-    return currentAnswers.lastAnswerTimestamp
+    return model.lastAnswerTimestamp
 
   recordAnswerForUser = (userId) ->
-    currentUserAnswers = forUser userId
-    currentUserAnswers.currentQuestion += 1
-    setAnswersForUser userId, currentUserAnswers
+    model = forUser userId
+    questionModel = model.questions[model.currentQuestion]
+    answers = currentAnswersForUser userId
+    if questionModel.answerCallback != null
+      response = questionModel.answerCallback(answers)
+      followups = response.followups
+      if response.status == 'success'
+        model.currentQuestion += 1
+        model.questions.splice.apply(model.questions, [model.currentQuestion, 0].concat(followups));
+        setUser userId, model
+      else
+        return followups
+    else
+      model.currentQuestion += 1
 
-  setAnswersForUser = (userId, answers) ->
-    currentAnswers = all()
-    currentAnswers[userId] = answers
-    brain.set STATUS_KEY, currentAnswers
+    return null
+
+
+  setUser = (userId, model) ->
+    current = all()
+    current[userId] = model
+    brain.set STATUS_KEY, current
 
   forUser = (userId) ->
     currentAnswers = all()
     return currentAnswers[userId] ? {
+      questions: []
       answers: []
-      lastAnswerTimestamp: null,
+      responses: []
+      lastAnswerTimestamp: null
       currentQuestion: 0
     }
 
   userIsDone = (userId) ->
-    answers = forUser userId
-    return answers.currentQuestion == questions.length
+    model = forUser userId
+    return model.currentQuestion == model.questions.length
 
   nextQuestionForUser = (userId) ->
     if not userIsDone userId
-      answers = forUser userId
-      return questions[answers.currentQuestion]
+      model = forUser userId
+      questionModel = model.questions[model.currentQuestion]
+      return questionModel.getQuestion()
 
     return null
 
@@ -60,10 +88,10 @@ module.exports = (brain, questions) ->
       return null
 
     mappedAnswers = [] # list of tuples of answers
-    answers = forUser userId
-    for i in [0...answers.answers.length]
-      question = questions[i]
-      answer = answers.answers[i]
+    model = forUser userId
+    for i in [0...model.answers.length]
+      question = model.questions[i].getQuestion()
+      answer = model.answers[i]
       mappedAnswers.push([question, answer])
 
     return mappedAnswers
@@ -71,6 +99,7 @@ module.exports = (brain, questions) ->
   return {
     reset,
     all,
+    startStandupWithUser,
     recordAnswerForUser,
     recordMessageReceivedForUser,
     lastMessageReceivedForUser,

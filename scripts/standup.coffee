@@ -20,6 +20,7 @@ module.exports = (robot) ->
       config = JSON.parse(configJSONstr)
     catch
       robot.logger.error "can't load config"
+      return
 
   config = merge defaultConfig, config
 
@@ -29,8 +30,11 @@ module.exports = (robot) ->
     index = Math.floor(Math.random() * possibleMessages.length)
     return possibleMessages[index]
 
-  startStandupWithUser = (userName) ->
-    robot.messageRoom "@" + userName, config.questions[0]
+  startStandupWithUser = (user) ->
+    standupModel.startStandupWithUser(user.id)
+    firstQuestion = standupModel.nextQuestionForUser(user.id)
+    userName = user.name
+    robot.messageRoom "@" + userName, firstQuestion
     robot.messageRoom "@" + userName, randomMessage config.openings
 
   finalReportToSlackAttachmentFields = (report) ->
@@ -58,7 +62,7 @@ module.exports = (robot) ->
               "fields": finalReportToSlackAttachmentFields(finalReportData)
           }
       ]
-    # post the message
+
     robot.messageRoom "standup", msgData
 
   robot.listen(
@@ -67,7 +71,8 @@ module.exports = (robot) ->
       userId = message.user.id
       userRoom = message.user.room
       room = message.room
-      if !standupModel.userIsDone userId and room == userRoom and message.text?
+
+      if room == userRoom && !standupModel.userIsDone userId
         return message.text.substring robot.name.length
       else
         return false
@@ -78,7 +83,13 @@ module.exports = (robot) ->
       receivedTimestamp = standupModel.recordMessageReceivedForUser userId, answer
       setTimeout(() ->
         if receivedTimestamp == standupModel.lastMessageReceivedForUser(userId)
-          receivedTimestamp = standupModel.recordAnswerForUser userId
+          failResponse = standupModel.recordAnswerForUser userId
+          if failResponse != null
+            for resp in failResponse
+              response.reply resp
+
+            return
+
           if standupModel.userIsDone userId
             response.reply randomMessage config.closings
             userName = response.envelope.user.name
@@ -94,16 +105,23 @@ module.exports = (robot) ->
   getStandupUsers = (callback) ->
     robot.adapter.client.web.users.list().then((data) ->
       if data.members?
-        userNames = []
+        users = []
         for member in data.members
-          userName = member.name
-          if !member.deleted && !member.is_bot && config.excludedUsers.indexOf(userName) == -1
-            userNames.push(member.name)
+          if !member.deleted && !member.is_bot && config.excludedUsers.indexOf(member.name) == -1
+            users.push({name: member.name, id: member.id})
 
-        callback(userNames)
+        callback(users)
       else
         robot.logger.error data
     )
+
+  robot.router.get '/hubot/other-standup', (req, res) ->
+    getStandupUsers (users) ->
+      for user in users
+        if user.name == 'drewp' || user.name == 'neel' || user.name == 'omkarbhat'
+          startStandupWithUser(user)
+
+    res.send 'OK'
 
   robot.router.get '/hubot/start-standup', (req, res) ->
     standupModel.reset()
