@@ -115,14 +115,6 @@ module.exports = (robot) ->
         robot.logger.error data
     )
 
-  robot.router.get '/hubot/other-standup', (req, res) ->
-    getStandupUsers (users) ->
-      for user in users
-        if user.name == 'drewp' || user.name == 'neel' || user.name == 'omkarbhat'
-          startStandupWithUser(user)
-
-    res.send 'OK'
-
   robot.router.get '/hubot/start-standup', (req, res) ->
     standupModel.reset()
     getStandupUsers((users) ->
