@@ -122,12 +122,12 @@ module.exports = (robot) ->
     }]    
 
   robot.router.get '/hubot/test-standup', (req, res) ->
-  standupModel.reset()
-  getTestUsers((users) ->
-    users.map startStandupWithUser
-  )
+    standupModel.reset()
+    getTestUsers((users) ->
+      users.map startStandupWithUser
+    )
 
-  res.send 'OK'  
+    res.send 'OK'  
 
   robot.router.get '/hubot/start-standup', (req, res) ->
     standupModel.reset()
