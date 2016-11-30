@@ -117,8 +117,8 @@ module.exports = (robot) ->
 
   getTestUsers = () ->
     users = [{
-      name: "omkarbhat"
-      id: "U06MG6MHN"
+      name: "neel"
+      id: "U070J2XTK"
     }]    
 
   robot.router.get '/hubot/test-standup', (req, res) ->
