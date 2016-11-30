@@ -7,8 +7,8 @@
       "questionType": "repeated-followup",
       "question": "How many ventures do you coach?",
       "followups": [
-        "What's up with venture #{ordinal}",
-        "Any blockers with your {ordinal}?"
+        "What's up with the {ordinal} venture",
+        "Any blockers with it?"
       ]
     },
     "What're you working on? Any blockers?"
