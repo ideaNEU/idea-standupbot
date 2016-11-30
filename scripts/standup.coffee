@@ -104,13 +104,16 @@ module.exports = (robot) ->
 
   getStandupUsers = (callback) ->
     robot.adapter.client.web.users.list().then((data) ->
-      if data.members?
-        users = []
-        for member in data.members
-          if !member.deleted && !member.is_bot && config.excludedUsers.indexOf(member.name) == -1
-            users.push({name: member.name, id: member.id})
+      # if data.members?
+      users = [{
+          name: "omkarbhat"
+          id: "U06MG6MHN"
+      }]
+        # for member in data.members
+          # if !member.deleted && !member.is_bot && config.excludedUsers.indexOf(member.name) == -1
+            # users.push({name: member.name, id: member.id})
 
-        callback(users)
+      callback(users)
       else
         robot.logger.error data
     )
