@@ -115,19 +115,14 @@ module.exports = (robot) ->
         robot.logger.error data
     )
 
-  getTestUsers = () ->
-    users = [{
-      name: "neel"
-      id: "U070J2XTK"
-    }]    
 
-  robot.router.get '/hubot/test-standup', (req, res) ->
-    standupModel.reset()
-    getTestUsers((users) ->
-      users.map startStandupWithUser
-    )
-
-    res.send 'OK'  
+robot.router.get '/hubot/test-standup', (req, res) ->    
+    getStandupUsers (users) ->    
+      for user in users   
+        if user.name == 'drewp' || user.name == 'neel' || user.name == 'omkarbhat'    
+          startStandupWithUser(user)    
+     
+    res.send 'OK'
 
   robot.router.get '/hubot/start-standup', (req, res) ->
     standupModel.reset()
