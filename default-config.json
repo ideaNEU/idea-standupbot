@@ -1,14 +1,14 @@
 {
-  "responseTimeout": "0",
+  "responseTimeout": "3000",
   "excludedUsers": [],
   "reportChannel": "standup",
   "questions": [
     {
       "questionType": "repeated-followup",
-      "question": "How many ventures are you currently seeing?",
+      "question": "How many ventures do you coach?",
       "followups": [
-        "What's up with your {ordinal} venture or the #{number}",
-        "Any blockers with your {ordinal}?"
+        "What's up with the {ordinal} venture",
+        "Any blockers with it?"
       ]
     },
     "What're you working on? Any blockers?"

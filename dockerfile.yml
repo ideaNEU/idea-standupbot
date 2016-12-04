@@ -1,0 +1,14 @@
+web: 
+  build: ./
+  volumes: 
+    - "./:/src/"
+  ports:
+    - "80:3000"
+  links:
+    - redis
+  env_files:
+    - secrets.env
+  redis:
+      image: redis:alpine
+      ports:
+	   - "6379:6379" 	
