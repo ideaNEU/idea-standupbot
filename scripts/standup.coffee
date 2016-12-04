@@ -84,7 +84,7 @@ module.exports = (robot) ->
         userRoom = message.user.room
         room = message.room
 
-        if room == userRoom && !standupModel.userIsDone userId
+        if room == userRoom && !standupModel.userIsDone userId && message.text?
           return message.text.substring robot.name.length
         else
           return false
