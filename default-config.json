@@ -5,7 +5,7 @@
   "questions": [
     {
       "questionType": "repeated-followup",
-      "question": "How many ventures did you see?",
+      "question": "How many ventures are you currently seeing?",
       "followups": [
         "What's up with your {ordinal} venture or the #{number}",
         "Any blockers with your {ordinal}?"
