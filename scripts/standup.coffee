@@ -83,9 +83,17 @@ module.exports = (robot) ->
         userId = message.user.id
         userRoom = message.user.room
         room = message.room
+        messageText = message.text
 
-        if room == userRoom && !standupModel.userIsDone userId && message.text?
-          return message.text.substring robot.name.length
+        if message.message? and message.message.text?
+          messageText = message.message.text
+
+        hasMessage = messageText?
+        correctRoom = room == userRoom
+        userIsDone = standupModel.userIsDone userId
+
+        if correctRoom and !userIsDone and hasMessage
+          return messageText.substring robot.name.length
         else
           return false
       # Callback
